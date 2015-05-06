@@ -39,6 +39,8 @@ extern "C" {
     sor* init_sor(int rank, int num_proc, int matrix_width,
                 int matrix_height, int p_h, int p_w, float p_threshold);
     int compute(sor* block, int cnv_check);
+    float compute_red(sor* block, int cnv_check);
+    float compute_black(sor* block, int cnv_check);
     void dispach_data(sor* block);
 
 #ifdef	__cplusplus

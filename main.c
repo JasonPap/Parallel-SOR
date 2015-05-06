@@ -31,20 +31,48 @@ int main(void)
 
     ///initialize each process block
     sor* myblock = init_sor(rank_id, proc_num, matrix_width, matrix_height, h, w, threshold);
-    int converged = 0;
+    int converged = false;
     int round = 1;
+    float redmax = 0;
+    float blackmax = 0;
+    float maxdif = 0;
+    float globalmaxdif = 0;
 
     //start timer
     double start_time = MPI_Wtime();
 
     do
     {
-        sync_ext(myblock);
-        if ( round%20 == 0)
-            converged = compute(myblock, true);
-        else
-            compute(myblock, false);
 
+        if ( round%20 == 0)
+        {
+            sync_ext(myblock);
+            redmax = compute_red(myblock, true);
+            sync_ext(myblock);
+            blackmax = compute_black(myblock, true);
+
+            maxdif = redmax > blackmax ? redmax : blackmax;
+            if (myblock->rank_id == 0)
+            {
+                MPI_Reduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
+                if ( globalmaxdif > threshold)
+                    converged = true;
+            }
+            else
+            {
+                MPI_Reduce(&maxdif, NULL, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
+            }
+
+        }
+        else
+        {
+            sync_ext(myblock);
+            compute_red(myblock, true);
+            sync_ext(myblock);
+            compute_black(myblock, true);
+        }
+
+        round++;
 
     }while(!converged);
     if ( rank_id == 0 )

@@ -202,3 +202,74 @@ int compute(sor* block, int cnv_check)
     return false;
 }
 
+float compute_red(sor* block, int cnv_check)
+{
+    int i, width, height, *data, *next_data;
+    width = block->block_width;
+    height = block->block_height;
+    data = block->data;
+    next_data = block->next_data;
+    int w = block->w;
+    int h = block->h;
+    if ( cnv_check )
+    {
+        float max = 0;
+        float tmp;
+        ///compute red cells
+        for ( i = width + 1; i <= width*(height-1)-2; i+=2)
+        {
+            next_data[i] = (1 - w)*data[i] + (w/4)*( data[i-width] + data[i-1] + data[i+1] + data[i+width]);
+            tmp = abs(next_data[i] - data[i]);
+            if ( tmp > max )
+                max = tmp;
+        }
+        return max;
+
+    }
+    else
+    {
+        ///compute red cells
+        for ( i = width + 1; i <= width*(height-1)-2; i+=2)
+        {
+            next_data[i] = (1 - w)*data[i] + (w/4)*( data[i-width] + data[i-1] + data[i+1] + data[i+width]);
+        }
+        return 0;
+    }
+
+}
+
+float compute_black(sor* block, int cnv_check)
+{
+    int i, width, height, *data, *next_data;
+    width = block->block_width;
+    height = block->block_height;
+    data = block->data;
+    next_data = block->next_data;
+    int w = block->w;
+    int h = block->h;
+    if ( cnv_check )
+    {
+        float max = 0;
+        float tmp;
+        ///compute black cells
+        for ( i = width + 2; i <= width*(height-1)-2; i+=2)
+        {
+            next_data[i] = (1 - w)*data[i] + (w/4)*( next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
+            tmp = abs(next_data[i] - data[i]);
+            if ( tmp > max )
+                max = tmp;
+        }
+        return max;
+
+    }
+    else
+    {
+        ///compute black cells
+        for ( i = width + 2; i <= width*(height-1)-2; i+=2)
+        {
+            next_data[i] = (1 - w)*data[i] + (w/4)*( next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
+        }
+    }
+    return false;
+}
+

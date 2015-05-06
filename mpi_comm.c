@@ -92,12 +92,15 @@ void getNeighbors(sor* block)
 void mpi_sync(sor* block)
 {
     //copy data to swap buffers so it wont conflict with received data
-    memcpy(block->top_row, block->data, block->block_width * sizeof(float));
-    memcpy(block->bottom_row, &(block->data[block->block_height * (block->block_width - 1) - 1]), block->block_width * sizeof(float));
+    memcpy(block->top_row, &(block->data[block->block_width]), block->block_width * sizeof(float));
+    //memcpy(block->bottom_row, &(block->data[block->block_height * (block->block_width - 1) - 1]), block->block_width * sizeof(float));
+    memcpy(block->bottom_row, &(block->data[block->block_width * (block->block_height -2)]), block->block_width * sizeof(float));
     int i, j;
-    for ( i = 0, j = 0; i < (block->block_width - 1) * block->block_height; i+=block->block_width , ++j )
+    /*for ( i = 0, j = 0; i < (block->block_width - 1) * block->block_height; i+=block->block_width , ++j )
+        block->first_col[j] = block->data[i];*/
+    for ( i = 1, j = 0; i <= block->block_width *(block->block_height -1 ) + 1; i+=block->block_width , ++j )
         block->first_col[j] = block->data[i];
-    for ( i = block->block_width - 1, j = 0; i < block->block_width * block->block_height; i+=block->block_width , ++j)
+    for ( i = block->block_width - 2, j = 0; i < block->block_width * block->block_height - 1; i+=block->block_width , ++j)
         block->last_col[j] = block->data[i];
 
     //sync with surrounding processes

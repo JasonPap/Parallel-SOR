@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "sor.h"
 #include "mpi_comm.h"
@@ -141,7 +142,8 @@ void sync_ext(sor* block)
 
 int compute(sor* block, int cnv_check)
 {
-    int i, width, height, *data, *next_data;
+    int i, width, height;
+    float *data, *next_data;
     width = block->block_width;
     height = block->block_height;
     data = block->data;
@@ -204,7 +206,8 @@ int compute(sor* block, int cnv_check)
 
 float compute_red(sor* block, int cnv_check)
 {
-    int i, width, height, *data, *next_data;
+    int i, width, height;
+    float *data, *next_data;
     width = block->block_width;
     height = block->block_height;
     data = block->data;
@@ -240,7 +243,8 @@ float compute_red(sor* block, int cnv_check)
 
 float compute_black(sor* block, int cnv_check)
 {
-    int i, width, height, *data, *next_data;
+    int i, width, height;
+    float *data, *next_data;
     width = block->block_width;
     height = block->block_height;
     data = block->data;

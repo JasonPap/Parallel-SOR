@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 #include "mpi_comm.h"
 #include "sor.h"
 #define true 1
@@ -27,6 +28,7 @@ int main(void)
 
     ///create cartesian topology/comunicator
     int rank_id = init_mpi_cart(dims);
+    printf("my rank is %d\n", rank_id);
     MPI_Barrier(CARTESIAN_COMM);
 
     ///initialize each process block
@@ -40,7 +42,8 @@ int main(void)
 
     //start timer
     double start_time = MPI_Wtime();
-
+    if (myblock->rank_id == 0)
+            printf("Timer started\n.");
     do
     {
 
@@ -71,14 +74,16 @@ int main(void)
             sync_ext(myblock);
             compute_black(myblock, true);
         }
-
+        if (myblock->rank_id == 0)
+            printf("round: %d completed\n.", round);
         round++;
 
-    }while(!converged);
+    }while(!converged && (round < 10));
     if ( rank_id == 0 )
     {
         printf("time: %f", MPI_Wtime() - start_time);
-        MPI_Abort(CARTESIAN_COMM, 1);
+        //MPI_Abort(CARTESIAN_COMM, 1);
+        MPI_Finalize();
     }
     return 0;
 }

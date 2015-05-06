@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "mpi_comm.h"
 
 typedef enum direction {LEFT, RIGHT, UP, DOWN} direction;
@@ -19,7 +20,7 @@ int init_mpi()
 int init_mpi_cart(int* dims)
 {
     int rank_id;
-
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank_id);
     //wrap-around
     int cyclic[2] = {1, 1};
     MPI_Cart_create(MPI_COMM_WORLD, 2, dims, cyclic, 1, &CARTESIAN_COMM);

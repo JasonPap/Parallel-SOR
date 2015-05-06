@@ -42,6 +42,7 @@ extern "C" {
     float compute_red(sor* block, int cnv_check);
     float compute_black(sor* block, int cnv_check);
     void dispach_data(sor* block);
+    void sync_ext(sor* block);
 
 #ifdef	__cplusplus
  }

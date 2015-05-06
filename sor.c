@@ -14,13 +14,13 @@
 //extern MPI_Comm CARTESIAN_COMM;
 
 //Initialize an sor struct
-sor* init_sor(int rank, int num_proc, int m_width, int m_height, int p_h,
-                int p_w, float p_threshold)
+sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
+                float p_w, float p_threshold)
 {
     sor* block = malloc(sizeof(sor));
     MPI_Cart_coords(CARTESIAN_COMM, rank, 2, block->coords);
     block->generation = 1;
-    block->h = p_h;
+    block->h = pow(p_h, 2);
     block->w = p_w;
     block->threshold = p_threshold;
     block->proc_num = num_proc;
@@ -221,7 +221,7 @@ float compute_red(sor* block, int cnv_check)
         ///compute red cells
         for ( i = width + 1; i <= width*(height-1)-2; i+=2)
         {
-            next_data[i] = (1 - w)*data[i] + (w/4)*( data[i-width] + data[i-1] + data[i+1] + data[i+width]);
+            next_data[i] = (1 - w)*data[i] + (w/4)*( h + data[i-width] + data[i-1] + data[i+1] + data[i+width]);
             tmp = abs(next_data[i] - data[i]);
             if ( tmp > max )
                 max = tmp;
@@ -234,7 +234,7 @@ float compute_red(sor* block, int cnv_check)
         ///compute red cells
         for ( i = width + 1; i <= width*(height-1)-2; i+=2)
         {
-            next_data[i] = (1 - w)*data[i] + (w/4)*( data[i-width] + data[i-1] + data[i+1] + data[i+width]);
+            next_data[i] = (1 - w)*data[i] + (w/4)*( h + data[i-width] + data[i-1] + data[i+1] + data[i+width]);
         }
         return 0;
     }
@@ -258,11 +258,15 @@ float compute_black(sor* block, int cnv_check)
         ///compute black cells
         for ( i = width + 2; i <= width*(height-1)-2; i+=2)
         {
-            next_data[i] = (1 - w)*data[i] + (w/4)*( next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
+            next_data[i] = (1 - w)*data[i] + (w/4)*( h + next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
             tmp = abs(next_data[i] - data[i]);
             if ( tmp > max )
                 max = tmp;
         }
+        float* swap_tmp = block->data;
+        block->data = block->next_data;
+        block->next_data = swap_tmp;
+        //printf("swaped\n");
         return max;
 
     }
@@ -271,9 +275,13 @@ float compute_black(sor* block, int cnv_check)
         ///compute black cells
         for ( i = width + 2; i <= width*(height-1)-2; i+=2)
         {
-            next_data[i] = (1 - w)*data[i] + (w/4)*( next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
+            next_data[i] = (1 - w)*data[i] + (w/4)*( h + next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
         }
+        float* swap_tmp = block->data;
+        block->data = block->next_data;
+        block->next_data = swap_tmp;
     }
+
     return false;
 }
 

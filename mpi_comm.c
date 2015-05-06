@@ -46,7 +46,7 @@ int init_mpi_cart(int* dims)
 //Create MPI datatypes needed for communication of processes
 void createDatatypes(int width, int height)
 {
-    MPI_Type_vector(height, 1, width + 1, MPI_FLOAT, &mpi_column);
+    MPI_Type_vector(height, 1, width , MPI_FLOAT, &mpi_column);
     MPI_Type_commit(&mpi_column);
 
     MPI_Type_vector(1, width, 0, MPI_FLOAT, &mpi_row);
@@ -104,6 +104,9 @@ void mpi_sync(sor* block)
     for ( i = block->block_width - 2, j = 0; i < block->block_width * block->block_height - 1; i+=block->block_width , ++j)
         block->last_col[j] = block->data[i];
 
+    //if (block->rank_id == 0)
+    //printf("buffers ready\n");
+    //MPI_Barrier(CARTESIAN_COMM);
     //sync with surrounding processes
     MPI_Status status;
     //left col
@@ -114,7 +117,8 @@ void mpi_sync(sor* block)
     MPI_Sendrecv(block->last_col, block->block_height, MPI_FLOAT, block->rank_right, LEFT,
                 block->data, 1, mpi_column, block->rank_left, LEFT,
                 CARTESIAN_COMM, &status );
-
+    /*if (block->rank_id == 0)
+    printf("left received\n");*/
     //right col
     /*MPI_Sendrecv(block->first_col, block->block_height, MPI_FLOAT, block->rank_left, RIGHT,
                 block->data, 1, mpi_column, block->rank_left, RIGHT,
@@ -123,6 +127,8 @@ void mpi_sync(sor* block)
     MPI_Sendrecv(block->first_col, block->block_height, MPI_FLOAT, block->rank_left, RIGHT,
                 &(block->data[block->block_width - 1]), 1, mpi_column, block->rank_right, RIGHT,
                 CARTESIAN_COMM, &status );
+    /*if (block->rank_id == 0)
+    printf("right received\n");*/
     //first row
     /*MPI_Sendrecv(block->top_row, block->block_width, MPI_FLOAT, block->rank_upper, UP,
                 block->data, 1, mpi_row, block->rank_upper, UP,
@@ -131,10 +137,14 @@ void mpi_sync(sor* block)
     MPI_Sendrecv(block->top_row, block->block_width, MPI_FLOAT, block->rank_upper, UP,
                 &(block->data[block->block_height * (block->block_width - 1) - 1]), 1, mpi_row, block->rank_lower,
                 UP, CARTESIAN_COMM, &status );
+    /*if (block->rank_id == 0)
+    printf("low received\n");*/
     //last row
     MPI_Sendrecv(block->bottom_row, block->block_width, MPI_FLOAT, block->rank_lower, DOWN,
                 block->data, 1, mpi_row, block->rank_upper, DOWN,
                 CARTESIAN_COMM, &status );
+    /*if (block->rank_id == 0)
+    printf("up received\n");*/
 
     block->generation += 1;
 }

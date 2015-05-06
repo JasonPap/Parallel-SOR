@@ -260,6 +260,8 @@ float compute_black(sor* block, int cnv_check)
         {
             next_data[i] = (1 - w)*data[i] + (w/4)*( h + next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
             tmp = abs(next_data[i] - data[i]);
+            if(block->rank_id == 0)
+                printf("data = %f , next = %f and tmp = %f\n", data[i], next_data[i], tmp);
             if ( tmp > max )
                 max = tmp;
         }

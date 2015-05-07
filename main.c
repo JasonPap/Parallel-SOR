@@ -49,9 +49,13 @@ int main(int argc, char* argv[])
     float maxdif = 0;
     float globalmaxdif = 0;
 
-    //start timer
+    //printf("before timer h = %f\n", myblock->h);
+    ///start timer
     double start_time = MPI_Wtime();
-
+    compute_red(myblock, true);
+    compute_black(myblock, true);
+    //printf("loop starting\n");
+    //printf("h = %f\n", myblock->h);
     do
     {
 
@@ -81,24 +85,24 @@ int main(int argc, char* argv[])
         else
         {
             sync_ext(myblock);
-
+            //printf("h = %f\n", myblock->h);
             //printf("sync 1 \n");
-            MPI_Barrier(CARTESIAN_COMM);
+            //MPI_Barrier(CARTESIAN_COMM);
 
             compute_red(myblock, true);
 
             //printf("red computed\n");
-            MPI_Barrier(CARTESIAN_COMM);
+            //MPI_Barrier(CARTESIAN_COMM);
 
             sync_ext(myblock);
 
             //printf("sync 2 \n");
-            MPI_Barrier(CARTESIAN_COMM);
+            //MPI_Barrier(CARTESIAN_COMM);
 
             compute_black(myblock, true);
 
             //printf("black computed\n");
-            MPI_Barrier(CARTESIAN_COMM);
+            //MPI_Barrier(CARTESIAN_COMM);
         }
         MPI_Barrier(CARTESIAN_COMM);
         if (myblock->rank_id == 0)

@@ -249,8 +249,8 @@ float compute_black(sor* block, int cnv_check)
     height = block->block_height;
     data = block->data;
     next_data = block->next_data;
-    int w = block->w;
-    int h = block->h;
+    float w = block->w;
+    float h = block->h;
     if ( cnv_check )
     {
         float max = 0;
@@ -259,10 +259,10 @@ float compute_black(sor* block, int cnv_check)
         for ( i = width + 2; i <= width*(height-1)-2; i+=2)
         {
             next_data[i] = (1 - w)*data[i] + (w/4)*( h + next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
-            tmp = abs(next_data[i] - data[i]);
-            if(block->rank_id == 0)
-                printf("data = %f , next = %f and tmp = %f\n", data[i], next_data[i], tmp);
-            if ( tmp > max )
+            tmp = fabs(next_data[i] - data[i]);
+            /*if(block->rank_id == 0)
+                printf("h = %f, data = %f , next = %f and tmp = %f\n", h, data[i], next_data[i], tmp);
+            */if ( tmp > max )
                 max = tmp;
         }
         float* swap_tmp = block->data;

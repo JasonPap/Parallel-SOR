@@ -65,7 +65,7 @@ sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
     if ( block->coords[1] != block->grid_size - 1 )
     {
         for ( i = block->block_width - 1; i < block->block_width * block->block_height; i+=block->block_width )
-            block->data[i] = 0;
+            block->data[i] = 1;
     }
 
     getNeighbors(block);

@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
                 MPI_Reduce(&maxdif, NULL, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
             }*/
             MPI_Allreduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, CARTESIAN_COMM);
-            printf("globalmaxdif = %f\n", globalmaxdif);
+            //printf("globalmaxdif = %f\n", globalmaxdif);
             if ( globalmaxdif < threshold)
                     converged = true;
         }
@@ -104,9 +104,9 @@ int main(int argc, char* argv[])
             //printf("black computed\n");
             //MPI_Barrier(CARTESIAN_COMM);
         }
-        MPI_Barrier(CARTESIAN_COMM);
-        if (myblock->rank_id == 0)
-            printf("round: %d completed\n", round);
+        //MPI_Barrier(CARTESIAN_COMM);
+        /*if (myblock->rank_id == 0)
+            printf("round: %d completed\n", round);*/
         round++;
 
     }while(!converged && (round < 10000));

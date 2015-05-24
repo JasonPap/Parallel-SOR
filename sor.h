@@ -29,15 +29,15 @@ extern "C" {
         int rank_left;
         int rank_right;
 
-        int matrix_width;
-        int matrix_height;
+        //int matrix_width;
+        //int matrix_height;
 
         int block_width;
         int block_height;
     }sor;
 
     sor* init_sor(int rank, int num_proc, int matrix_width,
-                int matrix_height, float p_h, float p_w, float p_threshold);
+                int matrix_height, float p_h, float p_w, float p_threshold, int q);
     int compute(sor* block, int cnv_check);
     float compute_red(sor* block, int cnv_check);
     float compute_black(sor* block, int cnv_check);

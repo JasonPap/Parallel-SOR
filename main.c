@@ -12,14 +12,14 @@
 
 extern MPI_Comm CARTESIAN_COMM;
 
-//arguments: dimention, w, threshold
+//arguments: dimention, w, threshold, q
 
 int main(int argc, char* argv[])
 {
-    if( argc != 4)
+    if( argc != 5)
     {
          printf("Wrong number of arguments.\n");
-         printf("Usage: %s <array dimention> <w> <threshold>\n", argv[0]);
+         printf("Usage: %s <array dimention> <w> <threshold> <q>\n", argv[0]);
          return 1;
     }
 
@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     float threshold = atof(argv[3]);
     float h = 1/(float)(matrix_width + 1);
     float w = atof(argv[2]);
+    int q = atoi(argv[4]);
 
     srand(time(NULL));
     int proc_num = init_mpi();
@@ -41,7 +42,7 @@ int main(int argc, char* argv[])
     MPI_Barrier(CARTESIAN_COMM);
 
     ///initialize each process block
-    sor* myblock = init_sor(rank_id, proc_num, matrix_width, matrix_height, h, w, threshold);
+    sor* myblock = init_sor(rank_id, proc_num, matrix_width, matrix_height, h, w, threshold, q);
     int converged = false;
     int round = 1;
     float redmax = 0;
@@ -78,7 +79,8 @@ int main(int argc, char* argv[])
                 MPI_Reduce(&maxdif, NULL, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
             }*/
             MPI_Allreduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, CARTESIAN_COMM);
-            //printf("globalmaxdif = %f\n", globalmaxdif);
+            if (myblock->rank_id == 0)
+                printf("globalmaxdif = %f\n", globalmaxdif);
             if ( globalmaxdif < threshold)
                     converged = true;
         }
@@ -112,7 +114,8 @@ int main(int argc, char* argv[])
     }while(!converged && (round < 10000));
     if ( rank_id == 0 )
     {
-        printf("time: %f", MPI_Wtime() - start_time);
+        printf("time: %f seconds\n", MPI_Wtime() - start_time);
+        printf("Did %d rounds.\n", round);
         //MPI_Abort(CARTESIAN_COMM, 1);
     }
     MPI_Finalize();

@@ -15,7 +15,7 @@
 
 //Initialize an sor struct
 sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
-                float p_w, float p_threshold)
+                float p_w, float p_threshold, int q)
 {
     sor* block = malloc(sizeof(sor));
     MPI_Cart_coords(CARTESIAN_COMM, rank, 2, block->coords);
@@ -25,11 +25,11 @@ sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
     block->threshold = p_threshold;
     block->proc_num = num_proc;
     block->rank_id = rank;
-    block->matrix_width = m_width;
-    block->matrix_height = m_height;
+    //block->matrix_width = m_width;
+    //block->matrix_height = m_height;
     block->grid_size = sqrt(num_proc);
-    block->block_width = m_width/block->grid_size + 2;
-    block->block_height = m_height/block->grid_size + 2;
+    block->block_width = (m_width*q)/num_proc + 2;
+    block->block_height = m_height/q + 2;
     block->data = malloc(block->block_width * block->block_height * sizeof(float));
     block->next_data = malloc(block->block_width * block->block_height * sizeof(float));
 
@@ -81,7 +81,7 @@ sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
 
 //distribute values to all the MPI processes from the master (rank 0)
 // !Not debugged!
-void dispach_data(sor* block)
+/*void dispach_data(sor* block)
 {
     if (block->rank_id == 0)
     {
@@ -130,7 +130,7 @@ void dispach_data(sor* block)
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
     }
-}
+}*/
 
 
 // send and receive top/bottom rows and first/last columns

@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     srand(time(NULL));
     int proc_num = init_mpi();
     //size of grid will be sqrt(proc_num) ^ 2
-    int dims[2] = {(int) sqrt(proc_num), (int) sqrt(proc_num)};
+    int dims[2] = { q, proc_num/q};
 
     ///create cartesian topology/comunicator
     int rank_id = init_mpi_cart(dims);
@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
     float blackmax = 0;
     float maxdif = 0;
     float globalmaxdif = 0;
+    float prev_glb_mx_dif = 0;
 
     //printf("before timer h = %f\n", myblock->h);
     ///start timer
@@ -79,10 +80,11 @@ int main(int argc, char* argv[])
                 MPI_Reduce(&maxdif, NULL, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
             }*/
             MPI_Allreduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, CARTESIAN_COMM);
-            if (myblock->rank_id == 0)
-                printf("globalmaxdif = %f\n", globalmaxdif);
-            if ( globalmaxdif < threshold)
+            /*if (myblock->rank_id == 0)
+                printf("globalmaxdif = %f\n", globalmaxdif);*/
+            if ( globalmaxdif < threshold || fabs(globalmaxdif - prev_glb_mx_dif) < threshold )
                     converged = true;
+            prev_glb_mx_dif = globalmaxdif;
         }
         else
         {

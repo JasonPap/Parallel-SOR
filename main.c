@@ -87,8 +87,7 @@ int main(int argc, char* argv[])
     }while(!converged && (round < 10000));
     if ( rank_id == 0 )
     {
-        printf("time: %f seconds\n", MPI_Wtime() - start_time);
-        printf("Did %d rounds.\n", round);
+        printf("%f,%d\n", MPI_Wtime() - start_time, --round);
     }
     MPI_Finalize();
     return 0;

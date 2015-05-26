@@ -110,7 +110,7 @@ void mpi_sync(sor* block)
 
     MPI_Irecv(block->data, 1, mpi_column, block->rank_left, LEFT, CARTESIAN_COMM, &(req[0]));
     MPI_Irecv(&(block->data[block->block_width - 1]), 1, mpi_column, block->rank_right, RIGHT, CARTESIAN_COMM, &(req[1]));
-    MPI_Irecv(&(block->data[block->block_height * (block->block_width - 1) - 1]), 1, mpi_row, block->rank_lower, UP, CARTESIAN_COMM, &(req[2]));
+    MPI_Irecv(&(block->data[block->block_width * (block->block_height -2)]), 1, mpi_row, block->rank_lower, UP, CARTESIAN_COMM, &(req[2]));
     MPI_Irecv(block->data, 1, mpi_row, block->rank_upper, DOWN, CARTESIAN_COMM, &(req[3]) );
 
     MPI_Isend(block->last_col, block->block_height, MPI_FLOAT, block->rank_right, LEFT, CARTESIAN_COMM, &(req[4]));

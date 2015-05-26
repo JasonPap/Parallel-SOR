@@ -1,5 +1,5 @@
 CC = mpicc
-FLAGS = -c # -Ofast
+FLAGS = -c -O3
 LINK_FLAGS = #-o3
 OBJS = main.o mpi_comm.o sor.o utils.o
 EXECUTABLE_NAME = parallel-sor
@@ -7,7 +7,7 @@ EXECUTABLE_NAME = parallel-sor
 
 # Compile
 all: $(OBJS)
-	$(CC) $(OBJS) $(LINK_FLAGS) -o $(EXECUTABLE_NAME) -lm
+	$(CC) -O3 $(OBJS) $(LINK_FLAGS) -o $(EXECUTABLE_NAME) -lm
 	rm $(OBJS)
 
 main.o: main.c

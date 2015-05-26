@@ -39,37 +39,31 @@ sor* init_sor(int rank, int num_proc, int m_width, int m_height, float p_h,
     int i;
     for ( i = 0; i < block->block_width * block->block_height; i++ )
         block->data[i] = 1;
-
     // set top row to zero
     if ( block->coords[0] != 0 )
     {
         for ( i = 0; i < block->block_width; i++ )
             block->data[i] = 0;
     }
-
     // set bottom row to zero
     if ( block->coords[0] != block->grid_size - 1)
     {
         for ( i = (block->block_width - 1) * block->block_height - 1; i < block->block_width * block->block_height; i++ )
             block->data[i] = 0;
     }
-
     // set first column to zero
     if ( block->coords[1] != 0 )
     {
         for ( i = 0; i < (block->block_width - 1) * block->block_height; i+=block->block_width )
             block->data[i] = 0;
     }
-
     // set last column to zero
     if ( block->coords[1] != block->grid_size - 1 )
     {
         for ( i = block->block_width - 1; i < block->block_width * block->block_height; i+=block->block_width )
             block->data[i] = 1;
     }
-
     getNeighbors(block);
-
     //allocate swap-buffers for send/receive
     block->top_row = malloc(block->block_width * sizeof(float));
     block->bottom_row = malloc(block->block_width * sizeof(float));
@@ -162,7 +156,6 @@ int compute(sor* block, int cnv_check)
             if ( tmp > max )
                 max = tmp;
         }
-
         ///compute black cells
         for ( i = width + 2; i <= width*(height-1)-2; i+=2)
         {
@@ -171,9 +164,7 @@ int compute(sor* block, int cnv_check)
             if ( tmp > max )
                 max = tmp;
         }
-
         //comunicate max diff to master.
-
         if (block->rank_id == 0)
         {
             float maxOfmaxs;
@@ -260,17 +251,13 @@ float compute_black(sor* block, int cnv_check)
         {
             next_data[i] = (1 - w)*data[i] + (w/4)*( h + next_data[i-width] + next_data[i-1] + next_data[i+1] + next_data[i+width]);
             tmp = fabs(next_data[i] - data[i]);
-            /*if(block->rank_id == 0)
-                printf("h = %f, data = %f , next = %f and tmp = %f\n", h, data[i], next_data[i], tmp);
-            */if ( tmp > max )
+            if ( tmp > max )
                 max = tmp;
         }
         float* swap_tmp = block->data;
         block->data = block->next_data;
         block->next_data = swap_tmp;
-        //printf("swaped\n");
         return max;
-
     }
     else
     {
@@ -283,7 +270,6 @@ float compute_black(sor* block, int cnv_check)
         block->data = block->next_data;
         block->next_data = swap_tmp;
     }
-
     return false;
 }
 

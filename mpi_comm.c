@@ -90,49 +90,7 @@ void getNeighbors(sor* block)
     block->rank_right = rank_right;
 }
 
-/*void mpi_sync(sor* block)
-{
-    //copy data to swap buffers so it wont conflict with received data
-    memcpy(block->top_row, &(block->data[block->block_width]), block->block_width * sizeof(float));
-    //memcpy(block->bottom_row, &(block->data[block->block_height * (block->block_width - 1) - 1]), block->block_width * sizeof(float));
-    memcpy(block->bottom_row, &(block->data[block->block_width * (block->block_height -2)]), block->block_width * sizeof(float));
-    int i, j;
 
-    for ( i = 1, j = 0; i <= block->block_width *(block->block_height -1 ) + 1; i+=block->block_width , ++j )
-        block->first_col[j] = block->data[i];
-    for ( i = block->block_width - 2, j = 0; i < block->block_width * block->block_height - 1; i+=block->block_width , ++j)
-        block->last_col[j] = block->data[i];
-
-    //if (block->rank_id == 0)
-    //printf("buffers ready\n");
-    //MPI_Barrier(CARTESIAN_COMM);
-    //sync with surrounding processes
-    MPI_Status status;
-    //left col
-
-    MPI_Sendrecv(block->last_col, block->block_height, MPI_FLOAT, block->rank_right, LEFT,
-                block->data, 1, mpi_column, block->rank_left, LEFT,
-                CARTESIAN_COMM, &status );
-
-    //right col
-
-    MPI_Sendrecv(block->first_col, block->block_height, MPI_FLOAT, block->rank_left, RIGHT,
-                &(block->data[block->block_width - 1]), 1, mpi_column, block->rank_right, RIGHT,
-                CARTESIAN_COMM, &status );
-
-    //first row
-
-    MPI_Sendrecv(block->top_row, block->block_width, MPI_FLOAT, block->rank_upper, UP,
-                &(block->data[block->block_height * (block->block_width - 1) - 1]), 1, mpi_row, block->rank_lower,
-                UP, CARTESIAN_COMM, &status );
-    //last row
-    MPI_Sendrecv(block->bottom_row, block->block_width, MPI_FLOAT, block->rank_lower, DOWN,
-                block->data, 1, mpi_row, block->rank_upper, DOWN,
-                CARTESIAN_COMM, &status );
-
-    block->generation += 1;
-}
-*/
 void mpi_sync(sor* block)
 {
     //copy data to swap buffers so it wont conflict with received data

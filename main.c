@@ -33,12 +33,10 @@ int main(int argc, char* argv[])
 
     srand(time(NULL));
     int proc_num = init_mpi();
-    //size of grid will be sqrt(proc_num) ^ 2
     int dims[2] = { q, proc_num/q};
 
     ///create cartesian topology/comunicator
     int rank_id = init_mpi_cart(dims);
-    //printf("my rank is %d\n", rank_id);
     MPI_Barrier(CARTESIAN_COMM);
 
     ///initialize each process block
@@ -51,13 +49,10 @@ int main(int argc, char* argv[])
     float globalmaxdif = 0;
     float prev_glb_mx_dif = 0;
 
-    //printf("before timer h = %f\n", myblock->h);
     ///start timer
     double start_time = MPI_Wtime();
     compute_red(myblock, true);
     compute_black(myblock, true);
-    //printf("loop starting\n");
-    //printf("h = %f\n", myblock->h);
     do
     {
 
@@ -69,16 +64,7 @@ int main(int argc, char* argv[])
             blackmax = compute_black(myblock, true);
 
             maxdif = redmax > blackmax ? redmax : blackmax;
-            /*if (myblock->rank_id == 0)
-            {
-                MPI_Reduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
-                if ( globalmaxdif > threshold)
-                    converged = true;
-            }
-            else
-            {
-                MPI_Reduce(&maxdif, NULL, 1, MPI_FLOAT, MPI_MAX, 0, CARTESIAN_COMM);
-            }*/
+
             MPI_Allreduce(&maxdif, &globalmaxdif, 1, MPI_FLOAT, MPI_MAX, CARTESIAN_COMM);
             /*if (myblock->rank_id == 0)
                 printf("globalmaxdif = %f\n", globalmaxdif);*/
@@ -89,28 +75,13 @@ int main(int argc, char* argv[])
         else
         {
             sync_ext(myblock);
-            //printf("h = %f\n", myblock->h);
-            //printf("sync 1 \n");
-            //MPI_Barrier(CARTESIAN_COMM);
 
             compute_red(myblock, true);
 
-            //printf("red computed\n");
-            //MPI_Barrier(CARTESIAN_COMM);
-
             sync_ext(myblock);
 
-            //printf("sync 2 \n");
-            //MPI_Barrier(CARTESIAN_COMM);
-
             compute_black(myblock, true);
-
-            //printf("black computed\n");
-            //MPI_Barrier(CARTESIAN_COMM);
         }
-        //MPI_Barrier(CARTESIAN_COMM);
-        /*if (myblock->rank_id == 0)
-            printf("round: %d completed\n", round);*/
         round++;
 
     }while(!converged && (round < 10000));
@@ -118,7 +89,6 @@ int main(int argc, char* argv[])
     {
         printf("time: %f seconds\n", MPI_Wtime() - start_time);
         printf("Did %d rounds.\n", round);
-        //MPI_Abort(CARTESIAN_COMM, 1);
     }
     MPI_Finalize();
     return 0;
